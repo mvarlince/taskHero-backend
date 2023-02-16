@@ -7,7 +7,7 @@ export function getAllTasks(req, res){
     const db = getFirestoreInstance()
     console.log("--- connected to db ---")
     db.collection('tasks')
-    .sort('createdAt', 'desc')
+    .orderBy('createdAt', 'desc')
     .get()
     .then(collection => {
         console.log("--- getting collection ---")
@@ -20,16 +20,45 @@ export function getAllTasks(req, res){
 export async function addTask(req,res) {
     const {task} = req.body
     const newTask = {task, createdAt: FieldValue.serverTimestamp()}
-    const db = getFirestoreInstance()
+    const db = await getFirestoreInstance()
     db.collection('tasks')
     .add(newTask)
-    .then(res.send( () => getAllTasks(req,res) ))
+    .then( () => getAllTasks(req,res) )
     .catch(err => res.status(500).send({error: err.message}))
 }
 
-export async function updateTask(req, res) {
-    const { done } = req.body
+// delete
+
+export async function deleteTask(req,res) {
+    console.log("--- hitting function-----")
     const { taskId } = req.params
+    const db = await getFirestoreInstance()
+    console.log("--- connected to db ---")
+    db.collection('tasks')
+    console.log("--- getting collection ---")
+    .doc(taskId)
+    .delete()
+    .then( () => getAllTasks(req,res) )
+    .catch(err => res.status(500).send({error: err.message}))
+}
+
+
+// export async function deleteTask(req,res) {
+//     console.log("--- hitting function-----")
+//     const { taskId } = req.params
+//     const db = await getFirestoreInstance()
+//     console.log("--- connected to db ---")
+//     db.collection('tasks')
+//     console.log("--- getting collection ---")
+//     .doc(taskId)
+//     .delete()
+//     .then( () => getAllTasks(req,res) )
+//     .catch(err => res.status(500).send({error: err.message}))
+// }
+
+export async function updateTask(req, res) {
+    const { taskId  } = req.params
+    const { done } = req.body
     const db = getFirestoreInstance()
     db.collection('tasks')
     .doc(taskId)
@@ -37,3 +66,4 @@ export async function updateTask(req, res) {
     .then( () => getAllTasks(req,res) )
     .catch(err => res.status(500).send({error: err.message}))
 }
+
