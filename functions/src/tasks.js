@@ -2,9 +2,9 @@ import getFirestoreInstance from "./utils.js";
 import { FieldValue } from "firebase-admin/firestore";
 
 
-export function getAllTasks(req, res){
+export async function getAllTasks(req, res){
     console.log("--- hitting function-----")
-    const db = getFirestoreInstance()
+    const db = await getFirestoreInstance()
     console.log("--- connected to db ---")
     db.collection('tasks')
     .orderBy('createdAt', 'desc')
@@ -35,7 +35,6 @@ export async function deleteTask(req,res) {
     const db = await getFirestoreInstance()
     console.log("--- connected to db ---")
     db.collection('tasks')
-    console.log("--- getting collection ---")
     .doc(taskId)
     .delete()
     .then( () => getAllTasks(req,res) )
